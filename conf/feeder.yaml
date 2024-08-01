@@ -1,0 +1,28 @@
+feeder:
+  push_address: tcp://*:8000
+  sub_date: 20230328
+  sub_time: 0
+  wal: wal:///../data/feed.stock.wal?keep=100
+  enable_trace: true
+  enable_spot: true
+  enable_future: true
+  enable_option: true
+  enable_order: true
+  enable_knock: true
+  enable_queue: false
+  holo_sz_cycle: 0
+  holo_sh_cycle: 0
+  holo_threads: 0
+
+daapi:
+  daapi_serveraddress: tcp://222.73.119.230:9016
+  daapi_userid: MN000271
+  daapi_password: .888888
+  daapi_heartbeat: 3
+  daapi_authorcode: j2qUK+rcZC24+glu8C+XRubRYF1w4k0f
+  daapi_macdddress: aa_bb_cc_dd_ee_00
+  daapi_computername: aaa
+  daapi_softwareversion: v1.0.0
+  daapi_softwarename: feeder_daapi
+  #daapi_subcode         : HKEX
+  daapi_subcode: HKEX;SGXQ;CME;CME_CBT;NYBOT;ICE;LME;KRX
