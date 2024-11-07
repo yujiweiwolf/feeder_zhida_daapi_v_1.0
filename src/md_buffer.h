@@ -1,5 +1,7 @@
 // Copyright 2020 Fancapital Inc.  All rights reserved.
 #pragma once
+#include <mutex>
+#include <thread>
 #include <boost/atomic.hpp>
 #include "config.h"
 #include "DAMarketStruct.h"
@@ -40,7 +42,7 @@ public:
 namespace co {
 class MDBuffer {
  public:
-    MDBuffer();
+    MDBuffer(shared_ptr<FeedServer> feeder_server);
     ~MDBuffer();
     void Init();
     void Run();
@@ -48,10 +50,11 @@ class MDBuffer {
     void ProcessSnapshot(CMarketRspMarketDataField* pRspMarketData);
  private:
     int init_day_;
-    mutex mutex_;
+    std::mutex mutex_;
     boost::atomic<int> write_index_;
     CMarketRspMarketDataField buffer_[BUFFERLENGTH];
-    std::unordered_map<string, std::pair<int64_t, int64_t>> last_tick_;
-    int64_t pre_timestamp_ = 0;
+//    std::unordered_map<string, std::pair<int64_t, int64_t>> last_tick_;
+//    int64_t pre_timestamp_ = 0;
+    shared_ptr<FeedServer> feeder_server_;
 };
 }  // namespace co

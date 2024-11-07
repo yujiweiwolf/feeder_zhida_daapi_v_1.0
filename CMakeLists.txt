@@ -1,44 +1,54 @@
 # cmake_minimum_required(VERSION <specify CMake version here>)
 cmake_minimum_required(VERSION 3.19)
-project(lessdb)
+project(zhida_stock_feeder)
 
-set(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_BUILD_TYPE "Release")  # Release Debug
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wall")
+add_compile_options(-std=c++17 -Wall -O2)
+
 SET(ROOT_DIR "/home/work/sys/lib")
-#Release Debug
-set(CMAKE_BUILD_TYPE "Release")
 
-#find_package(X REQUIRED)
-#include_directories(${X_INCLUDE_DIRS})
+macro(SUBDIRLIST result curdir)
+    file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+    set(dirlist "")
+    foreach(child ${children})
+        if(IS_DIRECTORY ${curdir}/${child})
+            LIST(APPEND dirlist ${child})
+        endif()
+    endforeach()
+    set(${result} ${dirlist})
+endmacro()
 
-include_directories(${CMAKE_CURRENT_LIST_DIR}/lib/DAAPI_v1.15/include)
-link_directories(${CMAKE_CURRENT_LIST_DIR}/lib/DAAPI_v1.15/Linux/gcc5.4.0-6)
+SUBDIRLIST(all_sub_index ${ROOT_DIR})
+foreach(child ${all_sub_index})
+    list(APPEND all_include ${ROOT_DIR}/${child}/include)
+    list(APPEND all_lib ${ROOT_DIR}/${child}/lib)
+endforeach()
 
-add_executable(zhida_daapi_feeder
-        src/main.cc
-        src/md_buffer.h
-        src/md_callback.cc
-        src/config.h
-        src/daapi_server.cc
-        src/define.h
-        src/md_buffer.cc
-        src/daapi_server.h
-        src/md_callback.h
-        src/config.cc
-        )
+SET(API_VERSION "DAAPI_v1.15")
 
-target_link_libraries(zhida_daapi_feeder
-        DAApi feeder coral swordfish x stdc++fs yaml-cpp clickhouse-cpp-lib-static boost_program_options boost_iostreams z protobuf pthread boost_date_time boost_filesystem boost_regex boost_system  boost_chrono boost_log boost_program_options boost_thread boost_iostreams z protobuf protobuf-lite sodium zmq ssl crypto iconv pthread dl clickhouse-cpp-lib-static)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/lib/${API_VERSION}/include)
+include_directories(${all_include})
 
-FILE(GLOB LIBS_NAME "lib/DAAPI_v1.15/Linux/gcc5.4.0-6/*")
-MESSAGE("复制库文件 ${LIBS_NAME}")
-FILE(COPY ${LIBS_NAME} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+link_directories(${CMAKE_CURRENT_LIST_DIR}/lib/${API_VERSION}/Linux/gcc5.4.0-6 ${all_lib})
 
+aux_source_directory (./src SRC_LIST)
+
+SET(FEEDER "zhida_daapi_feeder")
+add_executable (${FEEDER} ${SRC_LIST})
+
+target_link_libraries(${FEEDER}
+        feeder coral swordfish x DAApi stdc++fs yaml-cpp clickhouse-cpp-lib-static boost_date_time boost_filesystem boost_regex boost_system  boost_chrono boost_log boost_program_options boost_thread boost_iostreams z protobuf protobuf-lite sodium zmq ssl crypto iconv pthread dl)
+
+
+FILE(COPY Dockerfile image.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 FILE(GLOB COMMON_LIB_NAME "${ROOT_DIR}/common_lib/lib/*so*")
-MESSAGE("复制公共库文件 ${COMMON_LIB_NAME}")
 FILE(COPY ${COMMON_LIB_NAME} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+FILE(GLOB LIBS_NAME "${CMAKE_CURRENT_LIST_DIR}/lib/${API_VERSION}/Linux/gcc5.4.0-6/*so*")
+FILE(COPY ${LIBS_NAME} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-FILE(COPY Dockerfile DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+FILE(COPY ${COMMON_LIB_NAME} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/image.sh "n=$1; v=`./$n -v`; ldd $n | grep /sys/lib/ | awk '{print $3}' | xargs -i cp -L -n {} .; docker build -t $n:$v .; rm -rf \${n}_$v.docker.tar.gz; docker save $n:$v > \${n}_$v.docker.tar && gzip \${n}_$v.docker.tar")
-
-add_custom_target(image COMMAND sh image.sh zhida_daapi_feeder DEPENDS zhida_daapi_feeder)
+add_custom_target(image COMMAND sh image.sh ${FEEDER} DEPENDS ${FEEDER})

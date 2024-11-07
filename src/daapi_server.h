@@ -11,5 +11,6 @@ class DaapiServer {
 
  private:
     vector<MDCallBack*> call_back_;
+    shared_ptr<FeedServer> feeder_server_;
 };
 }  // namespace co
