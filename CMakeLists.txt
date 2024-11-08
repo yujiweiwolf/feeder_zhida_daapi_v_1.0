@@ -1,6 +1,6 @@
 # cmake_minimum_required(VERSION <specify CMake version here>)
 cmake_minimum_required(VERSION 3.19)
-project(zhida_stock_feeder)
+project(zhida_stock_feeder_v_1.0)
 
 SET(CMAKE_BUILD_TYPE "Release")  # Release Debug
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")

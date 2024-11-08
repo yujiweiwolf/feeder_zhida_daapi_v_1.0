@@ -25,7 +25,7 @@ namespace co {
 
         auto filename = x::FindFile("feeder.yaml");
         YAML::Node root = YAML::LoadFile(filename);
-        opt_ = FeedOptions::Load(filename);
+        opt_ = QOptions::Load(filename);
         auto feeder = root["daapi"];
 
         daapi_serveraddress_ = getStr(feeder, "daapi_serveraddress");
@@ -59,6 +59,6 @@ namespace co {
             << "  daapi_subcode: " << daapi_subcode_ << endl
             << "  file_path: " << file_path_ << endl;
         ss << "+-------------------- configuration end   --------------------+";
-        LOG_INFO << endl << ss.str();
+        __info << endl << ss.str();
     }
 }  // namespace co

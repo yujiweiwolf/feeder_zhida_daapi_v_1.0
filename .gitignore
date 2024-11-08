@@ -25,4 +25,5 @@
 !lib/**/*.dll
 !lib/**/*.lib
 !lib/**/*.so
+cmake-build-debug/
 

@@ -16,11 +16,11 @@ namespace co {
     }
 
     void DaapiServer::Run() {
-        auto opt = Singleton<Config>::GetInstance()->opt();
-        feeder_server_ = std::make_shared<FeedServer>();
-        feeder_server_->Init(opt, opt->sub_date());
-        feeder_server_->Start();
-        Singleton<MDBuffer>::Instance(feeder_server_);
+        QOptionsPtr opt = Singleton<Config>::GetInstance()->opt();
+        QServer::Instance()->Init(opt);
+        QServer::Instance()->Start();
+
+        Singleton<MDBuffer>::Instance();
         Singleton<MDBuffer>::GetInstance()->Init();
 
         string daapi_subcode = Singleton<Config>::GetInstance()->daapi_subcode();
@@ -32,8 +32,8 @@ namespace co {
             call_back_.push_back(pCallBack);
             x::Sleep(100);
         }
-        feeder_server_->Wait();
-        feeder_server_->Stop();
+        QServer::Instance()->Wait();
+        QServer::Instance()->Stop();
     }
 }  // namespace co
 

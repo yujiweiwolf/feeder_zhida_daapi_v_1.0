@@ -79,13 +79,13 @@ class Config {
     inline string file_path() {
         return file_path_;
     }
-    inline std::shared_ptr<FeedOptions> opt() {
+    inline QOptionsPtr opt() {
         return opt_;
     }
     void Init();
 
  private:
-    std::shared_ptr<FeedOptions> opt_;
+    QOptionsPtr opt_;
     string daapi_serveraddress_;
     string daapi_userid_;
     string daapi_password_;

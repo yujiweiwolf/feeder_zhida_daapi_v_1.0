@@ -30,22 +30,22 @@ int main(int argc, char* argv[]) {
             return 0;
         }
 
-        LOG_INFO << "start daapi_feeder: version = " << co::kVersion << " ......";
+        __info << "start daapi_feeder: version = " << co::kVersion << " ......";
         Singleton<Config>::Instance();
         Singleton<Config>::GetInstance()->Init();
 
         DaapiServer server;
         server.Run();
 
-        LOG_INFO << "server is stopped.";
+        __info << "server is stopped.";
     } catch (x::Exception& e) {
-        LOG_ERROR << "server is crashed, " << e.what();
+        __fatal << "server is crashed, " << e.what();
         return 1;
     } catch (std::exception& e) {
-        LOG_ERROR << "server is crashed, " << e.what();
+        __fatal << "server is crashed, " << e.what();
         return 2;
     } catch (...) {
-        LOG_ERROR << "server is crashed, unknown reason";
+        __fatal << "server is crashed, unknown reason";
         return 3;
     }
     return 0;

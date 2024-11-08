@@ -25,7 +25,7 @@ namespace co {
         string file = market_ + "_Market.log";
         md_api_ = CMarketApi::CreateMarketApi(true, file.c_str());
         if (md_api_) {
-            LOG_INFO << market_ + ", API Version: " << md_api_->GetVersion();
+            __info << market_ + ", API Version: " << md_api_->GetVersion();
             md_api_->RegisterSpi(this);
             md_api_->RegisterNameServer(Singleton<Config>::GetInstance()->daapi_serveraddress().c_str());
             md_api_->SetHeartBeatTimeout(Singleton<Config>::GetInstance()->daapi_heartbeat());
@@ -38,7 +38,7 @@ namespace co {
     }
 
     void MDCallBack::OnFrontConnected() {
-        LOG_INFO << market_ + ", MdApi OnFrontConnected";
+        __info << market_ + ", MdApi OnFrontConnected";
         CMarketReqUserLoginField field;
         memset(&field, 0, sizeof(field));
         string _daapi_userid = Singleton<Config>::GetInstance()->daapi_userid();
@@ -70,7 +70,7 @@ namespace co {
         memset(&field, 0, sizeof(field));
         field.SubscMode = DAF_SUB_Append;
         field.MarketType = DAF_TYPE_Future;
-        //// ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½
+        //// ·Ö±ð¶©ÔÄÁ½¸ö½»Ò×ËùµÄÆ·ÖÖ
         //field.MarketCount = 2;
         //string temp = "SGXQ,CN*";
         //strncpy(field.MarketTrcode[0], temp.c_str(), temp.length());
@@ -83,44 +83,44 @@ namespace co {
         strcpy(field.MarketTrcode[0], _sub_context.c_str());
         int ret = md_api_->ReqMarketData(&field, ++req_id_);
         if (ret > 0) {
-            LOG_INFO << market_ + ", SubscFutureMarket succeed" << endl;
+            __info << market_ + ", SubscFutureMarket succeed" << endl;
         } else {
-            LOG_ERROR << market_ + ", SubscFutureMarket failded" << endl;
+            __error << market_ + ", SubscFutureMarket failded" << endl;
         }
     }
 
     void MDCallBack::OnFrontDisconnected(int nReason) {
         is_login_ = false;
-        LOG_ERROR << market_ + ", OnFrontDisconnected nReason = " << nReason;
+        __error << market_ + ", OnFrontDisconnected nReason = " << nReason;
     }
 
     void MDCallBack::OnHeartBeatWarning(int iTimeLapse) {
-        // LOG_INFO << " OnHeartBeatWarning " << iTimeLapse;
+        // __info << " OnHeartBeatWarning " << iTimeLapse;
     }
 
     void MDCallBack::OnRspUserLogin(CMarketRspInfoField* pRspInfo, int iRequestID, bool bIsLast) {
         if (pRspInfo->ErrorID == 0) {
             is_login_ = true;
-            LOG_INFO << market_ + ", OnRspUserLogin Succeed";
+            __info << market_ + ", OnRspUserLogin Succeed";
             SubscFutureMarket();
         } else {
-            LOG_ERROR << market_ + ",OnRspUserLogin ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg;
+            __error << market_ + ",OnRspUserLogin ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg;
         }
     }
 
     void MDCallBack::OnRspUserLogout(CMarketRspInfoField* pRspInfo, int iRequestID, bool bIsLast) {
         if (pRspInfo->ErrorID == 0) {
             is_login_ = false;
-            LOG_INFO << market_ + ", OnRspUserLogout";
+            __info << market_ + ", OnRspUserLogout";
         } else {
-            LOG_ERROR << market_ + ", OnRspUserLogout ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg;
+            __error << market_ + ", OnRspUserLogout ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg;
         }
     }
 
     void MDCallBack::OnRspMarketData(CMarketRspMarketDataField* pRspMarketData, CMarketRspInfoField* pRspInfo,
                                      int iRequestID, bool bIsLast) {
         if (pRspInfo->ErrorID) {
-            LOG_ERROR << "OnRspUserLogin ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg;
+            __error << "OnRspUserLogin ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg;
         } else if (pRspMarketData) {
             Singleton<MDBuffer>::GetInstance()->AddMdbuffer(pRspMarketData);
         }
